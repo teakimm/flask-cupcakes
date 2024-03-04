@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Add a Cupcake</h2>
+<form method="POST" id="cupcake-form">
+  <p>Flavor  <input required name="flavor"></p>
+  <p>Size  <input required name="size"></p>
+  <p>Rating  <input required name="rating"></p>
+  <p>Image URL  <input name="image_url"></p>
+  <button>Add</button>
+</form>
+
+<ul class="cupcake-list"></ul>
+
+
+{% endblock %}

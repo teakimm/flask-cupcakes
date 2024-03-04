@@ -1,11 +1,10 @@
+from models import db, Cupcake
+from app import app
+from unittest import TestCase
 import os
 
 os.environ["DATABASE_URL"] = 'postgresql:///cupcakes_test'
 
-from unittest import TestCase
-
-from app import app
-from models import db, Cupcake
 
 # Make Flask errors be real errors, rather than HTML pages with error info
 app.config['TESTING'] = True
@@ -49,6 +48,7 @@ class CupcakeViewsTestCase(TestCase):
         db.session.rollback()
 
     def test_list_cupcakes(self):
+        """tests if route returns json of cupcake list"""
         with app.test_client() as client:
             resp = client.get("/api/cupcakes")
 
@@ -66,6 +66,7 @@ class CupcakeViewsTestCase(TestCase):
             })
 
     def test_get_cupcake(self):
+        """tests if route of cupcake id returns a json of cupcake data"""
         with app.test_client() as client:
             url = f"/api/cupcakes/{self.cupcake_id}"
             resp = client.get(url)
@@ -83,6 +84,9 @@ class CupcakeViewsTestCase(TestCase):
             })
 
     def test_create_cupcake(self):
+        """tests if sending json data creates a cupcake and returns
+        json of created cupcake
+        """
         with app.test_client() as client:
             url = "/api/cupcakes"
             resp = client.post(url, json=CUPCAKE_DATA_2)
@@ -105,3 +109,36 @@ class CupcakeViewsTestCase(TestCase):
             })
 
             self.assertEqual(Cupcake.query.count(), 2)
+
+    def test_update_cupcake(self):
+        """tests if route of cupcake at id and passed json edits the cupcake
+        and returns json of edited cupcake"""
+        with app.test_client() as client:
+            url = f"/api/cupcakes/{self.cupcake_id}"
+            resp = client.patch(url, json=CUPCAKE_DATA_2)
+
+            self.assertEqual(resp.status_code, 200)
+            data = resp.json
+            self.assertEqual(data, {
+                "cupcake": {
+                    "id": self.cupcake_id,
+                    "flavor": "TestFlavor2",
+                    "size": "TestSize2",
+                    "rating": 10,
+                    "image_url": "http://test.com/cupcake2.jpg"
+                }
+            })
+
+    def test_delete_cupcake(self):
+        """tests if route of cupcake at id deletes the cupcake from the db"""
+        with app.test_client() as client:
+            url = f"/api/cupcakes/{self.cupcake_id}"
+            resp = client.delete(url)
+
+            self.assertEqual(resp.status_code, 200)
+            data = resp.json
+            self.assertEqual(data, {
+                "deleted": self.cupcake_id
+            })
+
+            self.assertEqual(Cupcake.query.count(), 0)

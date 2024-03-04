@@ -16,7 +16,8 @@ connect_db(app)
 @app.get("/api/cupcakes")
 def get_all_cupcakes_data():
     """Shows all of the cupcakes
-    Returns JSON {'cupcakes': [{id, flavor, size, rating, image_url}, ...]}"""
+    Returns JSON {'cupcakes': [{id, flavor, size, rating, image_url}, ...]}
+    """
 
     cupcakes = Cupcake.query.all()
 
@@ -48,10 +49,11 @@ def create_cupcake():
         }
     Returns JSON {'cupcake': {id, flavor, size, rating, image_url}}
     """
+
     flavor = request.json["flavor"]
     size = request.json["size"]
     rating = request.json["rating"]
-    image_url = request.json.get("image_url") or None
+    image_url = request.json.get("image_url")
 
     new_cupcake = Cupcake(flavor=flavor, size=size,
                           rating=rating, image_url=image_url)
@@ -63,17 +65,26 @@ def create_cupcake():
 
     return (jsonify(cupcake=serialized), 201)
 
+
 @app.patch("/api/cupcakes/<int:id>")
 def update_cupcake(id):
     """Updates a cupcake
-    Returns JSON {cupcake: {id, flavor, size, rating, image_url}}"""
+    Returns JSON {cupcake: {id, flavor, size, rating, image_url}}
+    """
 
     current_cupcake = Cupcake.query.get_or_404(id)
 
-    current_cupcake.flavor = request.json["flavor"]
-    current_cupcake.size = request.json["size"]
-    current_cupcake.rating = request.json["rating"]
-    current_cupcake.image_url = request.json.get("image_url") or DEFAULT_URL
+    current_cupcake.flavor = request.json.get(
+        "flavor", current_cupcake.flavor)
+
+    current_cupcake.size = request.json.get(
+        "size", current_cupcake.size)
+
+    current_cupcake.rating = request.json.get(
+        "rating", current_cupcake.rating)
+
+    current_cupcake.image_url = request.json.get(
+        "image_url", current_cupcake.image_url)
 
     db.session.commit()
 
@@ -81,3 +92,16 @@ def update_cupcake(id):
 
     return (jsonify(cupcake=serialized), 200)
 
+
+@app.delete("/api/cupcakes/<int:id>")
+def delete_cupcake(id):
+    """Deletes a cupcake
+     Returns JSON {"deleted": id}
+    """
+
+    current_cupcake = Cupcake.query.get_or_404(id)
+
+    db.session.delete(current_cupcake)
+    db.session.commit()
+
+    return (jsonify({"deleted": id}), 200)

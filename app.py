@@ -53,7 +53,7 @@ def create_cupcake():
     flavor = request.json["flavor"]
     size = request.json["size"]
     rating = request.json["rating"]
-    image_url = request.json.get("image_url")
+    image_url = request.json.get("image_url") or None
 
     new_cupcake = Cupcake(flavor=flavor, size=size,
                           rating=rating, image_url=image_url)
@@ -84,7 +84,7 @@ def update_cupcake(id):
         "rating", current_cupcake.rating)
 
     current_cupcake.image_url = request.json.get(
-        "image_url", current_cupcake.image_url)
+        "image_url", current_cupcake.image_url) or DEFAULT_URL
 
     db.session.commit()
 

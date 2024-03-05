@@ -3,14 +3,25 @@
 {% block content %}
 
 <h2>Add a Cupcake</h2>
-<form method="POST" id="cupcake-form">
-  <p>Flavor  <input required id="flavor" name="flavor"></p>
-  <p>Size  <input required id="size" name="size"></p>
-  <p>Rating  <input required id="rating" name="rating"></p>
-  <p>Image URL  <input id="image_url" name="image_url"></p>
-  <button>Add</button>
-</form>
+<form id="add" method="POST">
+  {{ form.hidden_tag() }} <!--add type=hidden form fields -->
 
+  {% for field in form
+  if field.widget.input_type != 'hidden' %}
+
+  <p>
+    {{ field.label }}
+    {{ field }}
+
+    {% for error in field.errors %}
+    {{ error }}
+    {% endfor %}
+  </p>
+
+  {% endfor %}
+
+  <button type="submit">Submit</button>
+</form>
 <ul class="cupcake-list"></ul>
 
 

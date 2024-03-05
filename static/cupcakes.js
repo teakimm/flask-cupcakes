@@ -46,7 +46,7 @@ async function createCupcake() {
       "flavor": $("#flavor").val(),
       "size": $("#size").val(),
       "rating": $("#rating").val(),
-      "image_url": $("#image_url").val() || null
+      "image_url": $("#image_url").val()
     }),
     headers: {
       "Content-Type": "application/json"

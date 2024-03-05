@@ -6,6 +6,7 @@ db = SQLAlchemy()
 
 DEFAULT_URL = "https://tinyurl.com/demo-cupcake"
 
+
 def connect_db(app):
     """Connect this database to provided Flask app.
 
@@ -16,11 +17,11 @@ def connect_db(app):
     db.app = app
     db.init_app(app)
 
+
 class Cupcake(db.Model):
     """blueprint for making cupcake"""
 
     __tablename__ = "cupcakes"
-
 
     id = db.Column(
         db.Integer,
@@ -58,3 +59,4 @@ class Cupcake(db.Model):
             "rating": self.rating,
             "image_url": self.image_url
         }
+

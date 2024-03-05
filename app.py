@@ -1,9 +1,11 @@
 """Flask app for Cupcakes"""
 import os
 
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, redirect
 
 from models import connect_db, Cupcake, db, DEFAULT_URL
+
+from forms import CupcakeForm
 
 app = Flask(__name__)
 
@@ -12,6 +14,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
 
 connect_db(app)
 
+app.config['SECRET_KEY'] = "I'LL NEVER TELL!!"
 
 @app.get("/api/cupcakes")
 def get_all_cupcakes_data():
@@ -107,8 +110,23 @@ def delete_cupcake(id):
     return (jsonify({"deleted": id}), 200)
 
 
-@app.get("/")
+@app.route("/", methods=["GET", "POST"])
 def render_homepage():
     """Shows a form to add a cupcake and list of cupcakes at the homepage"""
 
-    return render_template('home.html')
+    form = CupcakeForm()
+
+    if form.validate_on_submit():
+        flavor = form.flavor.data
+        size = form.size.data
+        rating = form.rating.data
+        image_url = form.image_url.data or None
+
+        new_cupcake = Cupcake(flavor=flavor, size=size,
+                              rating=rating, image_url=image_url)
+
+        db.session.add(new_cupcake)
+        db.session.commit()
+
+        return redirect("/")
+    return render_template('home.html', form=form)
